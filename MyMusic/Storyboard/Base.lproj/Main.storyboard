@@ -91,7 +91,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oTY-SL-rE2" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1994" y="1027"/>
+            <point key="canvasLocation" x="1966" y="1017"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="ruh-hd-ZBg">
@@ -209,7 +209,7 @@
         <!--Player Movie Controller-->
         <scene sceneID="pB9-rg-f2E">
             <objects>
-                <viewController storyboardIdentifier="movie player" title="Player Movie Controller" id="oZG-dl-aQH" customClass="MoviePlayerViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="moviePlayer" title="Player Movie Controller" id="oZG-dl-aQH" customClass="MoviePlayerViewController" customModule="MyMusic" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="RcH-35-RkL">
                         <rect key="frame" x="0.0" y="0.0" width="430" height="932"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -231,7 +231,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xPe-eW-2yZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1994" y="225"/>
+            <point key="canvasLocation" x="1965" y="225"/>
         </scene>
     </scenes>
     <resources>

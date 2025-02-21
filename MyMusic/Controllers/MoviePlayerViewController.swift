@@ -3,22 +3,17 @@ import AVFoundation
 
 class MoviePlayerViewController: UIViewController {
     
-    // MARK: - Propriedades Públicas
+    // Recebe o array e a posição do filme
     public var position: Int = 0
     public var movies: [Movie] = []
     
-    // Shuffle (opcional, como no Player de música)
     private var isShuffleOn = false
     
-    // MARK: - Player de Vídeo
     private var player: AVPlayer?
     private var playerLayer: AVPlayerLayer?
-    
-    // Timer para atualizar slider e labels
     private var timer: Timer?
     
-    // MARK: - Subviews
-    
+    // Subviews
     private let videoContainerView: UIView = {
         let v = UIView()
         v.backgroundColor = .black
@@ -40,7 +35,6 @@ class MoviePlayerViewController: UIViewController {
         return lbl
     }()
     
-    // Slider de Progresso e labels de tempo
     private let progressSlider: UISlider = {
         let slider = UISlider()
         slider.minimumTrackTintColor = .label
@@ -66,7 +60,6 @@ class MoviePlayerViewController: UIViewController {
         return lbl
     }()
     
-    // Botões de transporte
     private let backButton: UIButton = {
         let btn = UIButton()
         btn.setImage(UIImage(systemName: "backward.fill"), for: .normal)
@@ -90,7 +83,6 @@ class MoviePlayerViewController: UIViewController {
         return btn
     }()
     
-    // Slider de Volume
     private let volumeSlider: UISlider = {
         let slider = UISlider()
         slider.value = 0.7
@@ -100,7 +92,6 @@ class MoviePlayerViewController: UIViewController {
         return slider
     }()
     
-    // Shuffle & Playlist (opcionais)
     private let shuffleButton: UIButton = {
         let btn = UIButton()
         btn.setImage(UIImage(systemName: "shuffle"), for: .normal)
@@ -115,13 +106,12 @@ class MoviePlayerViewController: UIViewController {
         return btn
     }()
     
-    // MARK: - viewDidLoad
+    // MARK: - Ciclo de Vida
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        configureAudioSession()  // Necessário para reprodução de vídeo com som
-        configurePlayer()        // Inicializa o AVPlayer
+        configureAudioSession()
+        configurePlayer()
         
         setupUI()
         startTimer()
@@ -129,7 +119,6 @@ class MoviePlayerViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        // Ajustar o frame do playerLayer pra caber no container
         playerLayer?.frame = videoContainerView.bounds
     }
     
@@ -137,19 +126,17 @@ class MoviePlayerViewController: UIViewController {
         super.viewWillDisappear(animated)
         timer?.invalidate()
         timer = nil
-        // Se quiser parar o vídeo ao sair:
-        // player?.pause()
+        // player?.pause() se quiser parar ao sair
     }
     
-    // MARK: - Configurações de Áudio/Vídeo
+    // MARK: - Configuração
     
     private func configureAudioSession() {
         do {
-            // .moviePlayback: modo adequado pra vídeo
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback, options: [])
             try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
         } catch {
-            print("Falha ao configurar sessão de áudio:", error)
+            print("Falha ao configurar AVAudioSession:", error)
         }
     }
     
@@ -158,58 +145,54 @@ class MoviePlayerViewController: UIViewController {
         
         let movie = movies[position]
         
-        // Carregamos o vídeo do bundle (movie.fileName.mp4)
-        guard let path = Bundle.main.path(forResource: movie.fileName, ofType: "mp4") else {
-            print("Vídeo não encontrado no bundle.")
+        // Se for .mov, troque "mp4" -> "mov"
+        guard let path = Bundle.main.path(forResource: movie.fileName, ofType: "MOV") else {
+            print("Vídeo não encontrado: \(movie.fileName).MOV")
             return
         }
         
         let url = URL(fileURLWithPath: path)
-        
-        // Inicializa o AVPlayer
         player = AVPlayer(url: url)
         
-        // Cria uma layer que exibirá o vídeo
         playerLayer = AVPlayerLayer(player: player)
         playerLayer?.videoGravity = .resizeAspect
         
-        // Adiciona a layer ao container
         if let layer = playerLayer {
             videoContainerView.layer.addSublayer(layer)
         }
         
-        // Ajusta volume inicial
         player?.volume = volumeSlider.value
-        
-        // Inicia a reprodução
         player?.play()
     }
-    
-    // MARK: - Layout da tela
     
     private func setupUI() {
         view.backgroundColor = .systemBackground
         
-        // Adiciona subviews
         let subviews = [
             videoContainerView,
             movieTitleLabel,
             directorLabel,
-            currentTimeLabel, progressSlider, remainingTimeLabel,
-            backButton, playPauseButton, nextButton,
-            volumeSlider, shuffleButton, playlistButton
+            currentTimeLabel,
+            progressSlider,
+            remainingTimeLabel,
+            backButton,
+            playPauseButton,
+            nextButton,
+            volumeSlider,
+            shuffleButton,
+            playlistButton
         ]
+        
         subviews.forEach {
             view.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
-        // Preenche dados do filme atual
+        // Preenche os dados do filme atual
         let movie = movies[position]
         movieTitleLabel.text = movie.name
         directorLabel.text = movie.directorName
         
-        // Ações de botões
         backButton.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
         playPauseButton.addTarget(self, action: #selector(didTapPlayPause), for: .touchUpInside)
         nextButton.addTarget(self, action: #selector(didTapNext), for: .touchUpInside)
@@ -218,40 +201,32 @@ class MoviePlayerViewController: UIViewController {
         shuffleButton.addTarget(self, action: #selector(didTapShuffle), for: .touchUpInside)
         playlistButton.addTarget(self, action: #selector(didTapPlaylist), for: .touchUpInside)
         
-        // Constraints: exemplo simples
         NSLayoutConstraint.activate([
-            // Container de vídeo na parte de cima
             videoContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             videoContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             videoContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             videoContainerView.heightAnchor.constraint(equalTo: videoContainerView.widthAnchor, multiplier: 0.6),
             
-            // Título do filme
             movieTitleLabel.topAnchor.constraint(equalTo: videoContainerView.bottomAnchor, constant: 20),
             movieTitleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             movieTitleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            // Diretor
             directorLabel.topAnchor.constraint(equalTo: movieTitleLabel.bottomAnchor, constant: 8),
             directorLabel.leadingAnchor.constraint(equalTo: movieTitleLabel.leadingAnchor),
             directorLabel.trailingAnchor.constraint(equalTo: movieTitleLabel.trailingAnchor),
             
-            // Tempo atual
             currentTimeLabel.topAnchor.constraint(equalTo: directorLabel.bottomAnchor, constant: 30),
             currentTimeLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             currentTimeLabel.widthAnchor.constraint(equalToConstant: 40),
             
-            // Tempo restante
             remainingTimeLabel.centerYAnchor.constraint(equalTo: currentTimeLabel.centerYAnchor),
             remainingTimeLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             remainingTimeLabel.widthAnchor.constraint(equalToConstant: 50),
             
-            // Slider de progresso
             progressSlider.centerYAnchor.constraint(equalTo: currentTimeLabel.centerYAnchor),
             progressSlider.leadingAnchor.constraint(equalTo: currentTimeLabel.trailingAnchor, constant: 8),
             progressSlider.trailingAnchor.constraint(equalTo: remainingTimeLabel.leadingAnchor, constant: -8),
             
-            // Botões de transporte
             playPauseButton.topAnchor.constraint(equalTo: currentTimeLabel.bottomAnchor, constant: 30),
             playPauseButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             playPauseButton.widthAnchor.constraint(equalToConstant: 60),
@@ -267,18 +242,15 @@ class MoviePlayerViewController: UIViewController {
             nextButton.widthAnchor.constraint(equalToConstant: 50),
             nextButton.heightAnchor.constraint(equalToConstant: 50),
             
-            // Slider de Volume
             volumeSlider.topAnchor.constraint(equalTo: playPauseButton.bottomAnchor, constant: 30),
             volumeSlider.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             volumeSlider.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-            // Shuffle
             shuffleButton.topAnchor.constraint(equalTo: volumeSlider.bottomAnchor, constant: 30),
             shuffleButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60),
             shuffleButton.widthAnchor.constraint(equalToConstant: 30),
             shuffleButton.heightAnchor.constraint(equalToConstant: 30),
             
-            // Playlist
             playlistButton.centerYAnchor.constraint(equalTo: shuffleButton.centerYAnchor),
             playlistButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60),
             playlistButton.widthAnchor.constraint(equalToConstant: 30),
@@ -286,8 +258,7 @@ class MoviePlayerViewController: UIViewController {
         ])
     }
     
-    // MARK: - Timer de progresso
-    
+    // Timer para atualizar o slider
     private func startTimer() {
         timer = Timer.scheduledTimer(timeInterval: 0.5,
                                      target: self,
@@ -316,19 +287,15 @@ class MoviePlayerViewController: UIViewController {
         return String(format: "%d:%02d", mins, secs)
     }
     
-    // MARK: - Botões
-    
     @objc private func didTapPlayPause() {
         guard let p = player else { return }
         
         if p.timeControlStatus == .playing {
-            // Pausa
             p.pause()
             let config = UIImage.SymbolConfiguration(pointSize: 40, weight: .bold, scale: .large)
             let image = UIImage(systemName: "play.fill", withConfiguration: config)
             playPauseButton.setImage(image, for: .normal)
         } else {
-            // Play
             p.play()
             let config = UIImage.SymbolConfiguration(pointSize: 40, weight: .bold, scale: .large)
             let image = UIImage(systemName: "pause.fill", withConfiguration: config)
@@ -371,15 +338,12 @@ class MoviePlayerViewController: UIViewController {
         timer?.invalidate()
         timer = nil
         
-        // Configura novamente o player pro filme da nova posição
         configurePlayer()
         
-        // Atualiza labels e título
         let movie = movies[position]
         movieTitleLabel.text = movie.name
         directorLabel.text = movie.directorName
         
-        // Volta o botão pra "pause" (pois ao tocar, já inicia tocando)
         playPauseButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
         
         startTimer()
@@ -391,7 +355,6 @@ class MoviePlayerViewController: UIViewController {
         let newTime = Float64(slider.value) * duration
         
         p.seek(to: CMTime(seconds: newTime, preferredTimescale: 1)) { [weak self] _ in
-            // Se estava pausado, retoma reprodução
             if p.timeControlStatus != .playing {
                 p.play()
                 let config = UIImage.SymbolConfiguration(pointSize: 40, weight: .bold, scale: .large)

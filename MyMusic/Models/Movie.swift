@@ -1,18 +1,9 @@
-//
-//  Movie.swift
-//  MyMusic
-//
-//  Created by Lucas Santos on 20/02/25.
-//  Copyright © 2025 ASN GROUP LLC. All rights reserved.
-//
 import Foundation
 
 struct Movie {
-    let name: String          // título do filme
-    let releaseYear: String   // ano de lançamento
-    let directorName: String  // diretor
-    let imageName: String     // nome da imagem de capa (ex: "cover1")
-    let fileName: String      // nome do arquivo de vídeo no bundle (ex: "video1")
+    let name: String          // Título do filme
+    let releaseYear: String   // Ano de lançamento
+    let directorName: String  // Diretor(a)
+    let imageName: String     // Nome da imagem no Assets (ex: "cover1")
+    let fileName: String      // Nome do arquivo de vídeo (sem extensão), ex: "movie1"
 }
-
-
